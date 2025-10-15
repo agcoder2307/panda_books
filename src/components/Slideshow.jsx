@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import robot from "../assets/hero/robot.jpg";
-import cyborg from "../assets/services/service-3.png";
+import bookImg from "../assets/bookLang.jpg";
 const Slideshow = () => {
-  const images = [robot, cyborg, robot];
+  const images = [bookImg, bookImg, bookImg];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -27,9 +26,15 @@ const Slideshow = () => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div
+      className="relative overflow-hidden"
+      style={{
+        width: "40%",
+        margin: "0 auto",
+      }}
+    >
       <div
-        className="flex transition-transform duration-700 ease-in-out"
+        className="flex transition-transform duration-700 ease-in-out w-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {images.map((src, index) => (
@@ -37,7 +42,8 @@ const Slideshow = () => {
             key={index}
             src={src}
             alt={`Slide ${index}`}
-            className="w-full h-80 object-cover flex-shrink-0"
+            className="object-cover rounded-lg"
+            style={{ width: "100%" }}
           />
         ))}
       </div>

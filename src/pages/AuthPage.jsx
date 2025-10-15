@@ -1,65 +1,174 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Form, Input, Button, Typography, Alert } from "antd";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { login } from "../app/authSlice";
+import { useNavigate } from "react-router-dom";
 
-const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const { Title } = Typography;
 
-  const toggleAuthMode = () => {
-    setIsLogin((prev) => !prev);
+const getValidationSchema = (isRegister) =>
+  Yup.object({
+    ...(isRegister && {
+      name: Yup.string().required("Name is required"),
+    }),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
+
+const AuthForm = () => {
+  const [isRegister, setIsRegister] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleFinish = async (values) => {
+    try {
+      setErrors({});
+      await getValidationSchema(isRegister).validate(values, {
+        abortEarly: false,
+      });
+
+      if (isRegister) {
+        setMessage(`✅ Registered: ${values.name}, ${values.email}`);
+        dispatch(
+          login({
+            name: values.name,
+            email: values.email,
+            password: values.password,
+          })
+        );
+      } else {
+        dispatch(
+          login({
+            name: "User1",
+            email: values.email,
+            password: values.password,
+          })
+        );
+        setMessage(`🔑 Logged in: ${values.email}`);
+      }
+      navigate("/");
+    } catch (validationError) {
+      const errorObj = {};
+      validationError.inner.forEach((err) => {
+        errorObj[err.path] = err.message;
+      });
+      setErrors(errorObj);
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          {isLogin ? "Login" : "Register"}
-        </h2>
-        <form className="space-y-4">
-          {!isLogin && (
-            <div>
-              <label className="block text-gray-700 mb-1">Name</label>
-              <input
-                type="text"
+    <div
+      style={{
+        backgroundColor: "#fff", // screen bg white
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 400,
+          padding: 32,
+          border: "1px solid #ddd",
+          borderRadius: 8,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          backgroundColor: "#fff",
+        }}
+      >
+        <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
+          {isRegister ? "Register" : "Login"}
+        </Title>
+
+        <Form layout="vertical" onFinish={handleFinish}>
+          {/* Name (only for register) */}
+          {isRegister && (
+            <Form.Item
+              label="Name"
+              name="name"
+              validateStatus={errors.name ? "error" : ""}
+              help={errors.name}
+            >
+              <Input
                 placeholder="Enter your name"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                style={{ backgroundColor: "#fff", color: "#000" }}
               />
-            </div>
+            </Form.Item>
           )}
-          <div>
-            <label className="block text-gray-700 mb-1">Email</label>
-            <input
+
+          {/* Email */}
+          <Form.Item
+            label="Email"
+            name="email"
+            validateStatus={errors.email ? "error" : ""}
+            help={errors.email}
+          >
+            <Input
               type="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+              style={{ backgroundColor: "#fff", color: "#000" }}
             />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg shadow-md hover:bg-blue-700 transition"
-          >
-            {isLogin ? "Login" : "Register"}
-          </button>
-        </form>
+          </Form.Item>
 
-        <p className="text-center text-gray-600 mt-6">
-          {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={toggleAuthMode}
-            className="text-blue-600 hover:underline font-medium"
+          {/* Password */}
+          <Form.Item
+            label="Password"
+            name="password"
+            validateStatus={errors.password ? "error" : ""}
+            help={errors.password}
           >
-            {isLogin ? "Register" : "Login"}
-          </button>
-        </p>
+            <Input.Password
+              placeholder="Enter your password"
+              style={{ backgroundColor: "#fff", color: "#000" }}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              style={{
+                backgroundColor: "#34b51c",
+                borderColor: "#34b51c",
+                fontWeight: "bold",
+              }}
+            >
+              {isRegister ? "Register" : "Login"}
+            </Button>
+          </Form.Item>
+        </Form>
+
+        {message && (
+          <Alert
+            message={message}
+            type="success"
+            showIcon
+            closable
+            style={{ marginTop: 16 }}
+          />
+        )}
+
+        <div style={{ marginTop: 16, textAlign: "center", color: "black" }}>
+          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+          <Button
+            type="link"
+            onClick={() => setIsRegister((prev) => !prev)}
+            style={{ padding: 0 }}
+          >
+            {isRegister ? "Login" : "Register"}
+          </Button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AuthPage;
+export default AuthForm;

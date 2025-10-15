@@ -1,46 +1,53 @@
 import Header from "../components/Header";
-import robot from "../assets/hero/robot.jpg";
-import cyborg from "../assets/services/service-3.png";
+import bookImg from "../assets/bookLang.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../app/authSlice";
+import { Button } from "antd";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { colors } from "../constants/colors";
+const user = {
+  avatar: "/account.svg",
+  username: "John Doe",
+  email: "john.doe@example.com",
+  cart: [
+    {
+      id: 1,
+      title: "English Learning Book",
+      price: 50000,
+      quantity: 2,
+      image: bookImg,
+    },
+    {
+      id: 2,
+      title: "Grammar Mastery Guide",
+      price: 65000,
+      quantity: 1,
+      image: bookImg,
+    },
+  ],
+  purchaseHistory: [
+    {
+      id: 1,
+      title: "Beginner's English",
+      price: 40000,
+      quantity: 1,
+      date: "2025-08-21",
+      image: bookImg,
+    },
+    {
+      id: 2,
+      title: "Advanced Vocabulary",
+      price: 70000,
+      quantity: 2,
+      date: "2025-07-10",
+      image: bookImg,
+    },
+  ],
+};
 const UserInfo = () => {
-  const user = {
-    avatar: "/account.svg",
-    username: "John Doe",
-    email: "john.doe@example.com",
-    cart: [
-      {
-        id: 1,
-        title: "English Learning Book",
-        price: 50000,
-        quantity: 2,
-        image: robot,
-      },
-      {
-        id: 2,
-        title: "Grammar Mastery Guide",
-        price: 65000,
-        quantity: 1,
-        image: cyborg,
-      },
-    ],
-    purchaseHistory: [
-      {
-        id: 1,
-        title: "Beginner's English",
-        price: 40000,
-        quantity: 1,
-        date: "2025-08-21",
-        image: robot,
-      },
-      {
-        id: 2,
-        title: "Advanced Vocabulary",
-        price: 70000,
-        quantity: 2,
-        date: "2025-07-10",
-        image: cyborg,
-      },
-    ],
-  };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white min-h-screen">
@@ -53,12 +60,23 @@ const UserInfo = () => {
             alt={user.username}
             className="w-32 h-32 rounded-full object-cover shadow-lg"
           />
-          <div>
+          <div className="flex flex-col gap-3">
             <h1 className="text-3xl font-bold text-gray-800">
               {user.username}
             </h1>
             <p className="text-gray-600">{user.email}</p>
+            <Button
+              className="custom-btn"
+              variant="outlined"
+              onClick={() => {
+                dispatch(logout());
+                navigate("/");
+              }}
+            >
+              Logout
+            </Button>
           </div>
+          <div></div>
         </div>
 
         {/* Cart */}
@@ -86,6 +104,13 @@ const UserInfo = () => {
                 </p>
               </div>
             ))}
+            <button
+              className="px-6 py-3 text-white rounded-lg shadow hover:bg-blue-700 transition"
+              style={{ backgroundColor: colors.primary }}
+              onClick={() => navigate("/cart")}
+            >
+              Go to Checkout
+            </button>
           </div>
         </div>
 

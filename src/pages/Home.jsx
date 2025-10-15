@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import robot from "../assets/hero/robot.jpg";
-import cyborg from "../assets/services/service-3.png";
+import bookImg from "../assets/bookLang.jpg";
 import Slideshow from "../components/Slideshow";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import { colors } from "../constants/colors";
 
 const Home = () => {
   const [index, setIndex] = useState(0);
@@ -32,26 +32,33 @@ const Home = () => {
         id="home"
         className="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto px-6 py-12"
       >
-        <div className="md:w-1/2 space-y-6">
+        <div className="md:w-1/2 space-y-6 px-3">
           <h2 className="text-3xl md:text-5xl font-bold leading-tight">
-            Learn English with <span className="text-blue-600">E-ReadBook</span>
+            Learn English with{" "}
+            <span style={{ color: colors.primary }}>Panda Books</span>
           </h2>
           <p className="text-gray-700 text-lg">
             Improve your English skills by reading engaging books designed for
             learners of all levels.
           </p>
           <div className="space-x-4">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+            <button
+              className="px-6 py-3 text-white rounded-lg shadow hover:bg-blue-700 transition"
+              style={{ backgroundColor: colors.primary }}
+            >
               Get Started
             </button>
-            <button className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition">
+            <button
+              className="px-6 py-3 border text-black rounded-lg transition"
+              style={{ borderColor: colors.primary, backgroundColor: "white" }}
+            >
               Browse Books
             </button>
           </div>
         </div>
         <div className="md:w-1/2 mt-8 md:mt-0">
           <img
-            src={cyborg}
+            src={bookImg}
             alt="Reading Illustration"
             className="w-full rounded-xl shadow-lg"
           />
@@ -74,7 +81,7 @@ const Home = () => {
                 className="bg-gray-50 rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col"
               >
                 <img
-                  src={robot}
+                  src={bookImg}
                   alt={`Book ${book}`}
                   className="rounded-md mb-4"
                 />
@@ -87,7 +94,7 @@ const Home = () => {
                 </p>
                 <button
                   onClick={() => navigate("/details")}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="mt-4 px-4 py-2  rounded hover:bg-blue-700"
                 >
                   Buy Now
                 </button>
@@ -147,16 +154,14 @@ const Home = () => {
                 rows="4"
                 className="w-full border rounded-lg px-4 py-2 bg-white"
               ></textarea>
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                Send
-              </button>
+              <button className="px-6 py-3 rounded-lg transition">Send</button>
             </form>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-blue-700 text-white py-6 mt-auto">
+      <footer className="wavy text-white py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
           <p>
             &copy; {new Date().getFullYear()} E-ReadBook. All rights reserved.

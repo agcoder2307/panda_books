@@ -1,6 +1,6 @@
 import { useState } from "react";
-import cyborg from "../assets/services/service-3.png";
-import robot from "../assets/hero/robot.jpg";
+
+import bookImg from "../assets/bookLang.jpg";
 import Header from "../components/Header";
 const BookDetails = () => {
   const book = {
@@ -9,7 +9,7 @@ const BookDetails = () => {
       "This book is designed for learners who want to improve their English skills with practical examples and exercises.",
     price: 50000,
     quantity: 12,
-    images: [cyborg, robot, cyborg],
+    images: [bookImg, bookImg, bookImg],
   };
 
   const [currentIndex, setCurrentIndex] = useState(0);
