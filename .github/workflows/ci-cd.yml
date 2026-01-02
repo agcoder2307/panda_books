@@ -62,7 +62,7 @@ jobs:
               # Minimal Nginx serve varianti (compose yo'q bo'lsa)
               # Build static files (prod) va Nginx orqali serve
               if [ -f "Dockerfile" ]; then
-                docker build -t panda-books-frontend:latest .
+                docker build -t panda-books-frontend:latest . 
                 docker rm -f panda-books-frontend || true
                 docker run -d --name panda-books-frontend -p 3000:80 panda-books-frontend:latest
               fi
