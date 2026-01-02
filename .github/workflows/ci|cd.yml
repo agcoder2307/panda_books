@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: Archive production build
-        uses: actions/upload-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: dist
@@ -36,7 +36,7 @@ jobs:
     needs: build
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: dist
