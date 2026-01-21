@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Typography, Alert } from "antd";
+import { Form, Input, Button, Typography, Alert, Spin } from "antd";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
-import { login } from "../app/authSlice";
+import { LoadingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { loginThunk, registerThunk } from "../app/auth.thunk";
 
 const { Title } = Typography;
 
@@ -16,12 +17,13 @@ const getValidationSchema = (isRegister) =>
       .email("Invalid email format")
       .required("Email is required"),
     password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
+      .min(5, "Password must be at least 5 characters")
       .required("Password is required"),
   });
 
 const AuthForm = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
   const dispatch = useDispatch();
@@ -29,37 +31,38 @@ const AuthForm = () => {
 
   const handleFinish = async (values) => {
     try {
+      setLoader(true);
       setErrors({});
       await getValidationSchema(isRegister).validate(values, {
         abortEarly: false,
       });
-
+      dispatch(
+        loginThunk({
+          data: { login: values.email, password: values.password },
+          navigate,
+          setLoader,
+        }),
+      );
       if (isRegister) {
-        setMessage(`✅ Registered: ${values.name}, ${values.email}`);
-        dispatch(
-          login({
-            name: values.name,
-            email: values.email,
-            password: values.password,
-          })
-        );
+        // setMessage(`✅ Registered: ${values.name}, ${values.email}`);
       } else {
         dispatch(
-          login({
-            name: "User1",
-            email: values.email,
-            password: values.password,
-          })
+          registerThunk({
+            data: { login: values.email, password: values.password },
+            navigate,
+            setLoader,
+          }),
         );
-        setMessage(`🔑 Logged in: ${values.email}`);
+        // setMessage(`🔑 Logged in: ${values.email}`);
       }
-      navigate("/");
+      // navigate("/");
     } catch (validationError) {
       const errorObj = {};
       validationError.inner.forEach((err) => {
         errorObj[err.path] = err.message;
       });
       setErrors(errorObj);
+      setLoader(false);
     }
   };
 
@@ -157,13 +160,23 @@ const AuthForm = () => {
         )}
 
         <div style={{ marginTop: 16, textAlign: "center", color: "black" }}>
-          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+          {loader
+            ? ""
+            : isRegister
+              ? "Already have an account?"
+              : "Don't have an account?"}{" "}
           <Button
             type="link"
             onClick={() => setIsRegister((prev) => !prev)}
             style={{ padding: 0 }}
           >
-            {isRegister ? "Login" : "Register"}
+            {loader ? (
+              <Spin indicator={<LoadingOutlined spin />} />
+            ) : isRegister ? (
+              "Login"
+            ) : (
+              "Register"
+            )}
           </Button>
         </div>
       </div>

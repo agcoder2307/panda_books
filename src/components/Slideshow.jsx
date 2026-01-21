@@ -37,7 +37,7 @@ const Slideshow = () => {
         className="flex transition-transform duration-700 ease-in-out w-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
-        {images.map((src, index) => (
+        {images?.map((src, index) => (
           <img
             key={index}
             src={src}
@@ -50,7 +50,7 @@ const Slideshow = () => {
 
       {/* Pagination */}
       <div className="flex justify-center mt-4 space-x-2">
-        {images.map((_, index) => (
+        {images?.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}

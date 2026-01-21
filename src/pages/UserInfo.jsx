@@ -46,8 +46,15 @@ const user = {
   ],
 };
 const UserInfo = () => {
+  const { isLogin } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLogin) {
+      navigate("/");
+    }
+  }, [isLogin]);
 
   return (
     <div className="bg-white min-h-screen">
@@ -120,7 +127,7 @@ const UserInfo = () => {
             Purchase History
           </h2>
           <div className="space-y-6">
-            {user.purchaseHistory.map((item) => (
+            {user.purchaseHistory?.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center gap-6 p-4 rounded-xl shadow-md bg-gray-50"

@@ -12,7 +12,18 @@
   --font-grotesk: "Space Grotesk", sans-serif;
   color-scheme: dark;
 }
+@theme {
+  --animate-fade: fade 1s linear infinite alternate;
 
+  @keyframes fade {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
 * {
   scroll-behavior: smooth;
 }
@@ -43,11 +54,10 @@ button {
   );
 }
 
-
 .wavy-bottom {
   clip-path: polygon(
-    0% 0%, 
-    100% 0%, 
+    0% 0%,
+    100% 0%,
     100% 85%,
     90% 90%,
     80% 85%,
@@ -61,10 +71,6 @@ button {
     0% 85%
   );
 }
-
-
-
-
 
 .custom-btn:hover {
   border-color: #34b51c !important; /* darker green */
@@ -139,4 +145,15 @@ button {
 
 .-rotate-360 {
   @apply rotate-[-360deg];
+}
+
+.checkout.disabled,
+.checkout:disabled {
+  background: #d9d9d9;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.checkout:disabled:hover {
+  background: #d9d9d9;
 }

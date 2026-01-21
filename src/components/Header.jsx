@@ -1,12 +1,27 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { colors } from "../constants/colors";
 import logoWhite from "../assets/logoWhite.png";
-import { useSelector } from "react-redux";
-
-const Header = () => {
+import { useDispatch, useSelector } from "react-redux";
+import { ShoppingCartOutlined } from "@ant-design/icons";
+import { cartService } from "../services/cartService";
+import { addToCount } from "../app/cartSlice";
+const Header = ({ isNotFound = false }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isLogin, user } = useSelector((state) => state.auth);
+  const { isLogin } = useSelector((state) => state.auth);
+  const countItems = useSelector((state) => state.cartItems.items);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = {
+    name: "Joshua",
+    email: "abc@mail",
+  };
+
+  useEffect(() => {
+    cartService
+      .getCarts()
+      .then((res) => dispatch(addToCount(res.data?.products?.length)));
+  }, []);
 
   return (
     <header
@@ -22,21 +37,25 @@ const Header = () => {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-6 items-center">
-          <a href="#about" className=" text-white hover:text-gray-600">
-            About
-          </a>
-          <a href="#books" className=" text-white hover:text-gray-600">
-            Books
-          </a>
-          <a href="#slideshow" className=" text-white hover:text-gray-600">
-            Slideshow
-          </a>
-          <a href="#video" className=" text-white hover:text-gray-600">
-            Video
-          </a>
-          <a href="#contact" className=" text-white hover:text-gray-600">
-            Contact
-          </a>
+          {!isNotFound && (
+            <>
+              <a href="#about" className=" text-white hover:text-gray-600">
+                About
+              </a>
+              <a href="#books" className=" text-white hover:text-gray-600">
+                Books
+              </a>
+              <a href="#slideshow" className=" text-white hover:text-gray-600">
+                Slideshow
+              </a>
+              <a href="#video" className=" text-white hover:text-gray-600">
+                Video
+              </a>
+              <a href="#contact" className=" text-white hover:text-gray-600">
+                Contact
+              </a>
+            </>
+          )}
           <Link to={isLogin ? "/user" : "/login"}>
             <button
               className="px-3 py-1.5 text-black rounded-lg shadow hover:bg-blue-200 transition"
@@ -46,14 +65,30 @@ const Header = () => {
             </button>
           </Link>
         </nav>
+        <div className="flex items-center gap-5">
+          {isLogin && (
+            <div className="relative">
+              <ShoppingCartOutlined
+                style={{ color: "white", fontSize: "30px" }}
+                onClick={() => navigate("/cart")}
+              />
+              {countItems !== 0 && (
+                <span className="absolute top-[-10px] right-[-13px] bg-[red] px-[7px] rounded-[50%] text-white">
+                  {countItems}
+                </span>
+              )}
+            </div>
+          )}
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-gray-700 focus:outline-none"
-        >
-          {menuOpen ? "✕" : "☰"}
-        </button>
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-gray-700 focus:outline-none"
+            style={{ color: "white", fontSize: "30px" }}
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Nav */}
