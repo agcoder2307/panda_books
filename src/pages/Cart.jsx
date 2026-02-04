@@ -33,12 +33,15 @@ const CartPage = () => {
     },
   ]);
 
+  console.log({ countItems });
+
   const [data, setData] = useState([]);
   const dispatch = useDispatch();
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  const totalPrice =
+    data?.products?.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0,
+    ) ?? 0;
 
   useEffect(() => {
     cartService.getCarts().then((res) => setData(res.data));
@@ -56,7 +59,7 @@ const CartPage = () => {
       dispatch(addToCount(res.data.products?.length));
     });
   };
-  console.log({ data });
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <Header />

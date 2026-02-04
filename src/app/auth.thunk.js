@@ -7,7 +7,6 @@ export const loginThunk = createAsyncThunk(
   async ({ data, navigate, setLoader }, { dispatch }) => {
     try {
       const res = await authService.login(data).then((res) => {
-        console.log(res);
         dispatch(login(res?.data?.access_token));
       });
       setLoader(false);
@@ -24,7 +23,6 @@ export const registerThunk = createAsyncThunk(
   async ({ data, navigate, setLoader }, { dispatch }) => {
     try {
       const res = await authService.login(data).then((res) => {
-        console.log(res);
         dispatch(login(res?.data.access_token));
       });
       setLoader(false);
