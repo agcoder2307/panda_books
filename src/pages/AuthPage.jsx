@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Typography, Alert, Spin } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  Alert,
+  Spin,
+  notification,
+} from "antd";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -28,7 +36,19 @@ const AuthForm = () => {
   const [message, setMessage] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [api, contextHolder] = notification.useNotification();
+  const openNotificationWithIcon = (type) => {
+    api[type]({
+      title: "Success",
+      description: `Successfuly logged in`,
+    });
+  };
+  const registerNotificationWithIcon = (type) => {
+    api[type]({
+      title: "Success",
+      description: `Successfuly logged in`,
+    });
+  };
   const handleFinish = async (values) => {
     try {
       setLoader(true);
@@ -36,27 +56,37 @@ const AuthForm = () => {
       await getValidationSchema(isRegister).validate(values, {
         abortEarly: false,
       });
-      dispatch(
-        loginThunk({
-          data: { login: values.email, password: values.password },
-          navigate,
-          setLoader,
-        }),
-      );
+
       if (isRegister) {
-        // setMessage(`✅ Registered: ${values.name}, ${values.email}`);
-      } else {
         dispatch(
           registerThunk({
-            data: { login: values.email, password: values.password },
-            navigate,
+            data: {
+              email: values.email,
+              password: values.password,
+              name: values.name,
+            },
+            registerNotificationWithIcon,
+            setIsRegister,
             setLoader,
           }),
         );
-        // setMessage(`🔑 Logged in: ${values.email}`);
+        setLoader(false);
+      } else {
+        dispatch(
+          loginThunk({
+            data: { login: values.email, password: values.password },
+            navigate,
+            openNotificationWithIcon,
+            setLoader,
+          }),
+        );
       }
       // navigate("/");
     } catch (validationError) {
+      notification.error({
+        message: "Something went wrong try again",
+        placement: "topLeft",
+      });
       const errorObj = {};
       validationError.inner.forEach((err) => {
         errorObj[err.path] = err.message;
@@ -76,6 +106,7 @@ const AuthForm = () => {
         alignItems: "center",
       }}
     >
+      {/* {contextHolder} */}
       <div
         style={{
           width: 400,

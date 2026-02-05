@@ -8,7 +8,7 @@ import { cartService } from "../services/cartService";
 import { addToCount } from "../app/cartSlice";
 const Header = ({ isNotFound = false }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isLogin } = useSelector((state) => state.auth);
+  const { isLogin, user: userState } = useSelector((state) => state.auth);
   const countItems = useSelector((state) => state.cartItems.items);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -20,8 +20,9 @@ const Header = ({ isNotFound = false }) => {
   useEffect(() => {
     cartService
       .getCarts()
-      .then((res) => dispatch(addToCount(res.data?.products?.length)));
+      .then((res) => dispatch(addToCount(res.data?.products?.length ?? 0)));
   }, []);
+  console.log(userState);
 
   return (
     <header

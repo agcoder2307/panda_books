@@ -24,6 +24,12 @@ const BookDetails = () => {
       description: `You successfully added items to cart`,
     });
   };
+  const errorNotificationWithIcon = (type) => {
+    api[type]({
+      title: "Error",
+      description: `Failed to add item to cart`,
+    });
+  };
   const book = {
     name: "English Learning Book",
     description:
@@ -40,12 +46,15 @@ const BookDetails = () => {
         productId: params.bookId,
         quantity: Number(bookAmount),
       };
-
-      await cartService.addToCart(body);
-      openNotificationWithIcon("success");
-
-      const res = await cartService.getCarts();
-      dispatch(addToCount(res?.data?.products?.length));
+      try {
+        await cartService.addToCart(body);
+        openNotificationWithIcon("success");
+        const res = await cartService.getCarts();
+        dispatch(addToCount(res?.data?.products?.length));
+      } catch (error) {
+        errorNotificationWithIcon("error");
+        setIsLoading(false);
+      }
     } else {
       navigate("/login");
     }

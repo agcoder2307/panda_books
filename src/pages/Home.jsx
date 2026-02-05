@@ -26,14 +26,15 @@ const Home = () => {
   }, [isAnimating]);
 
   useEffect(() => {
-    if (token) {
-      productService.getProducts().then((res) => {
-        setData(res?.data.list);
-      });
-    } else {
-      productService.getPublicProducts().then((res) => setData(res?.data.list));
-    }
-  }, [token]);
+    // if (token) {
+    //   productService.getProducts().then((res) => {
+    //     setData(res?.data.list);
+    //   });
+    // } else {
+    //   productService.getPublicProducts().then((res) => setData(res?.data.list));
+    // }
+    productService.getPublicProducts().then((res) => setData(res?.data.list));
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white text-gray-900">
