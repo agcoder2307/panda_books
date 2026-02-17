@@ -17,7 +17,6 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
   const createLink = async () => {
     try {
       paymentService.paymePurchase(orderId).then((res) => {
-        console.log({ res });
         setUrl(res.data);
       });
     } catch (error) {
@@ -27,10 +26,10 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
       });
     }
   };
-  console.log({ url });
+
   return (
     <Modal
-      title={<p>Choose the payment type</p>}
+      title={<h2>The Payment Type</h2>}
       loading={loading}
       open={open}
       onCancel={() => setOpen(false)}
@@ -38,11 +37,11 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
       cancelButtonProps={{ style: { display: "none" } }}
     >
       <div className="flex flex-col gap-15 mt-15">
-        <div className="flex gap-15 items-center">
+        <div className="flex gap-8 items-center ">
           {types.map((item) => (
             <div
               key={item.type}
-              className="flex items-center justify-center cursor-pointer bg-[#fafafa] w-[250px] h-[100px] p-[10px] rounded-lg transition-ease duration-300"
+              className="flex items-center justify-center cursor-pointer bg-[#fafafa] flex-1 h-[150px] p-[10px] rounded-lg transition-ease duration-300"
               style={{ border: item.type === type && "1px solid black" }}
               onClick={() => setType(item.type)}
             >
@@ -56,14 +55,26 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
           disabled={type.length === 0}
           onClick={createLink}
         >
-          Make a purchase
+          Choose payment type
         </button>
       </div>
-      <div className="flex flex-col gap-5 items-center">
+      <div className="flex flex-col gap-5 items-center mt-5">
         {url && (
-          <QRCodeCanvas value={url} size={200} level="H" includeMargin={true} />
+          <div className="flex flex-col gap-3 justify-center items-center">
+            <QRCodeCanvas
+              value={url}
+              size={200}
+              level="H"
+              includeMargin={true}
+            />
+            <p className="text-lg">Отсканируйте QR код</p>
+          </div>
         )}
-        {url && <a href={url}>or puchase from here</a>}
+        {url && (
+          <a href={url} style={{ textDecoration: "underline" }}>
+            или купите по этой ссылке
+          </a>
+        )}
       </div>
     </Modal>
   );
