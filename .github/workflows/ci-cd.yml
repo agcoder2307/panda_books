@@ -1,67 +1,90 @@
-name: Frontend CI/CD (Panda Books)
+name: Deploy frontend
 
 on:
   push:
-    branches: [ "main" ,"master"]
+    branches: [ "master" ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+      VITE_API_BASE: /api
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm run build
 
-      - name: Add custom type declarations
-        run: |
-          mkdir -p src/types
-          echo "declare module './app/store.js';" > src/types/store.d.ts
-          echo "declare module 'redux-persist/integration/react';" > src/types/redux-persist.d.ts
+      - name: Deploy dist to server
+        uses: appleboy/scp-action@v0.1.7name: Deploy frontend
 
-      - name: Build project
-        run: npm run build
+on:
+  push:
+    branches: [ "master" ]
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: dist
-
-  deploy:
+jobs:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    needs: build
+    env:
+      NODE_ENV: production
+      VITE_API_BASE: /api
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: dist
+      - uses: actions/checkout@v4
 
-      - name: Copy files to server
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Deploy dist to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "dist/*"
-          target: "~/panda_books/dist"
+          target: "/tmp/pandabooks_dist"
+          strip_components: 1
 
-      - name: Restart frontend container
-        uses: appleboy/ssh-action@v0.1.10
+      - name: Move to nginx root
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            sudo mkdir -p /var/www/pandabooks
+            sudo rsync -a --delete /tmp/pandabooks_dist/ /var/www/pandabooks/
+            sudo chown -R www-data:www-data /var/www/pandabooks
+            sudo systemctl reload nginx
+
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/*"
+          target: "/tmp/pandabooks_dist"
+          strip_components: 1
+
+      - name: Move to nginx root
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          command_timeout: 30m
           script: |
-            cd ~/panda_books
-            docker compose build
-            docker compose up -d --remove-orphans
+            set -e
+            sudo mkdir -p /var/www/pandabooks
+            sudo rsync -a --delete /tmp/pandabooks_dist/ /var/www/pandabooks/
+            sudo chown -R www-data:www-data /var/www/pandabooks
+            sudo systemctl reload nginx
