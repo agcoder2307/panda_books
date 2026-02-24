@@ -13,12 +13,22 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
     { image: click, type: "click" },
     { image: uzum, type: "uzum" },
   ];
-  console.log({ orderId });
-  const createLink = async () => {
+
+  const createLink = async (type) => {
     try {
-      paymentService.paymePurchase(orderId).then((res) => {
-        setUrl(res.data);
-      });
+      if (type === "click") {
+        paymentService.clickPurchase(orderId).then((res) => {
+          setUrl(res.data);
+        });
+      } else if (type === "uzum") {
+        paymentService.uzumPurchase(orderId).then((res) => {
+          setUrl(res.data);
+        });
+      } else {
+        paymentService.paymePurchase(orderId).then((res) => {
+          setUrl(res.data);
+        });
+      }
     } catch (error) {
       notification.error({
         message: "Something went wrong",
@@ -32,7 +42,11 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
       title={<h2>The Payment Type</h2>}
       loading={loading}
       open={open}
-      onCancel={() => setOpen(false)}
+      onCancel={() => {
+        setOpen(false);
+        setUrl("");
+        setType("");
+      }}
       okButtonProps={{ style: { display: "none" } }}
       cancelButtonProps={{ style: { display: "none" } }}
     >
@@ -53,7 +67,7 @@ const CheckoutModal = ({ open, setOpen, loading, orderId }) => {
           className={`bg-[#34b51c] flex justify-center rounded-md pt-2 pb-2 text-lg hover:bg-[#105110] transition-colors duration-300 checkout`}
           style={{ color: "#fff" }}
           disabled={type.length === 0}
-          onClick={createLink}
+          onClick={() => createLink(type)}
         >
           Choose payment type
         </button>
